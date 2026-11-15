@@ -2,6 +2,10 @@
 #include <vector>
 #include <deque>
 #include <iostream>
+#include <queue>
+#include <cmath>
+#include <limits>
+#include <iostream>
 
 struct CAdjacencyListGraph::SImplementation{
     struct SEdge{
@@ -149,21 +153,74 @@ struct CAdjacencyListGraph::SImplementation{
     // Calls the callback for each visited vertex.
     void DepthFirstSearch(TVertexID start, const TTraversalFunction &callback) const noexcept{
         std::vector<bool> Visited(DVertices.size(),false);
-        DepthFirstSearchInternal(start,VertexIDInvalid,0,Visited,callback);
+        if(VertexIDIsValid(start)){
+            DepthFirstSearchInternal(start,VertexIDInvalid,0,Visited,callback);
     }
 
 
     // Performs a weighted breadth-first search starting at the specified vertex.
     // Returns true if the search completes successfully.
     bool BreadthFirstSearchWeighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
-        
+        if(!VertexIDIsValid(start)){
         return false;
+        }
+        for(TVertexID Index = 0; Index < DVertices.size(); Index++){
+            if(VertexIDIsValid(Index)){
+                for(auto &Edge : DVertices[Index].DEdges){
+                    if(VertexIDIsValid(Edge.DDestination) && (std::isnan(Edge.DWeight < 0.0)){
+                        return false;
+                    }
+                }
+            }
+        }
+        using THorizonEntry = std::pair<double,TVertexID>;
+        std::priority_queue<THorizonEntry,std::vector<THorizonEntry>,std::greater<THorizonEntry>> Horizon;
+        std::vector<bool> Visited(DVertices.size(),false);
+        std::vector<double> Distance(DVertices.size(),std::numeric_limits<double>::infinity());
+        std::vector<std::size_t> Depth(DVertices.size(),0);
+        std::vector<TVertexID> Depth(DVertice.size(),VertexIDInvalid);
+        Distance[start] = 0.0;
+        Horizon.push({0.0,strat});
+        while(!Horizon.empty()){
+            auto Current + Horizon.top().second;
+            Horizon.pop();
+            if(Visited[Current]){
+                continue;
+            }
+            Visited[Current] = true;
+            auto Control = callback(Current,Parent[Current],Depth[Current],Distance[Current]);
+            if(Control == EGraphTraversal::Continue){
+                for(auto &Edge : DVertices[Current].DEdges){
+                    if(VertexIDIsValid(Edge.DDestination) && !Visited[Edge.DDestination]){
+                        auto NewDistance = Distance[Current] +Edge.DWeight;
+                        if(NewDistance < Distance[Edge.DDestination]){
+                            Distance[Edge.DDestination] = NewDistance;
+                            Parent[Edge.DDestination] = Current;
+                            Depth[Edge.DDestination] = Depth[Current] + 1;
+                            Horizon.push({NewDistance,Edge.DDestination});
+                        }
+                    }
+                }
+            }
+            else if(Control == EGraphTraversal::Stop){
+                return false;
+            }
+        }
+        return true;
     }
 
 
     // Visits every vertex in the graph, calling the callback for each one.
     // Returns true if the traversal completes successfully.
     bool ForEach(const TTraversalFunction &callback) const noexcept{
+        for(TVertexID Index = 0; Index < DVertices, size(); Index++{
+            if(VertexIDIsValid(Index)){
+                auto Control = callback(Index, VertexIDInvalid,0,std::numeric_limits<double>::quiet_NAN());
+                if(Control ==  EGraphTraversal::Stop){
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
