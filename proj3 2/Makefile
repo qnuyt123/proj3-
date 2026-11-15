@@ -46,7 +46,7 @@ all: make_directories 			\
 run_testgraph: $(TEST_GRAPH_TARGET)
 	$(TEST_GRAPH_TARGET)
 
-run_testmutablregraph: $(TEST_MUTABLE_GRAPH_TARGET)
+run_testmutablegraph: $(TEST_MUTABLE_GRAPH_TARGET)
 	$(TEST_MUTABLE_GRAPH_TARGET)
 
 generate_coverage:
