@@ -33,12 +33,21 @@ TEST_MUTABLE_GRAPH_OBJ_FILES	= $(TESTS_OBJ_DIR)/AdjacencyListGraph.o 			\
 						  	  		$(TESTS_OBJ_DIR)/MutableGraphTest.o 	
 
 TEST_MUTABLE_GRAPH_TARGET		= $(TESTS_BIN_DIR)/testmutablegraph
+TEST_CIRCUIT_TRACE_OBJ_FILES = $(TESTS_OBJ_DIR)/CircuitTrace.o \
+                               $(TESTS_OBJ_DIR)/CircuitTraceTest.o
+TEST_CIRCUIT_TRACE_TARGET = $(TESTS_BIN_DIR)/testcircuittrace
 
+TEST_CIRCUIT_NET_OBJ_FILES = $(TESTS_OBJ_DIR)/CircuitTrace.o \
+                             $(TESTS_OBJ_DIR)/CircuitNet.o \
+                             $(TESTS_OBJ_DIR)/CircuitNetTest.o
+TEST_CIRCUIT_NET_TARGET = $(TESTS_BIN_DIR)/testcircuitnet
 
 
 all: make_directories 			\
 	run_testgraph				\
-	run_testmutablregraph		\
+	run_testmutablegraph		\
+	run_testcircuittrace 		\
+    run_testcircuitnet 			\
 	generate_coverage 			\
 	$(ANALYSIS_TARGET)
 
@@ -49,9 +58,21 @@ run_testgraph: $(TEST_GRAPH_TARGET)
 run_testmutablegraph: $(TEST_MUTABLE_GRAPH_TARGET)
 	$(TEST_MUTABLE_GRAPH_TARGET)
 
+run_testcircuittrace: $(TEST_CIRCUIT_TRACE_TARGET)
+	$(TEST_CIRCUIT_TRACE_TARGET)
+
+run_testcircuitnet: $(TEST_CIRCUIT_NET_TARGET)
+	$(TEST_CIRCUIT_NET_TARGET)
+
+$(TEST_CIRCUIT_TRACE_TARGET): $(TEST_CIRCUIT_TRACE_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^ $(TEST_LDFLAGS) -o $@
+
+$(TEST_CIRCUIT_NET_TARGET): $(TEST_CIRCUIT_NET_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^ $(TEST_LDFLAGS) -o $@
+	
 generate_coverage:
-	$(LCOV) --capture --directory `pwd` --output-file $(COVERAGE_INFO_FILE) --ignore-errors inconsistent,source 2> lcov.err && \
-	grep -v "mismatched end line" lcov.err >&2 && rm -f lcov.err
+	$(LCOV) --capture --directory "`pwd`" --output-file $(COVERAGE_INFO_FILE) --ignore-errors inconsistent,source 2> lcov.err && \
+	grep -v "mismatched end line" lcov.err >&2 ; rm -f lcov.err
 	$(LCOV) --remove $(COVERAGE_INFO_FILE) '/usr/*' '*/tests/src/*'  --output-file $(COVERAGE_INFO_FILE)
 	$(GENHTML) $(COVERAGE_INFO_FILE) --output-directory $(TESTS_HTMLCOV_DIR)
 

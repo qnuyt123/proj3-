@@ -3,13 +3,16 @@
 
 #include "MutableGraph.h"
 #include <memory>
+#include <tuple>
 
-class CAdjacencyListGraph : public virtual CFullmutableGraph{
+class CAdjacencyListGraph : public virtual CFullMutableGraph{
   private:
     struct SImplementation;
     std::unique_ptr<SImplementation> DImplementation;
   public:
-    CAdjacencyListGraph(const std::vector<CGraph::TVertexTag>& tags,const std::vector<<::tuple<CGraph::TVertexID, CGraph::TVertexID, double, bool>>& edges);
+    CAdjacencyListGraph(
+      const std::vector<CGraph::TVertexTag>& tags,
+      const std::vector<std::tuple<CGraph::TVertexID, CGraph::TVertexID, double, bool>>& edges);
     
     ~CAdjacencyListGraph();
     
@@ -19,15 +22,17 @@ class CAdjacencyListGraph : public virtual CFullmutableGraph{
 
     bool GetVertexNeighbors(TVertexID id, std::vector <TVertexID> &neighbors) const noexcept override;
 
-    bool EdgeExists(TVertexID src, TvertexID dest) const noexcept override;
+    bool EdgeExists(TVertexID src, TVertexID dest) const noexcept override;
 
-    boll GetEdgeWeight(TVertexID src, TVertexID dest, double &weight) const noexcept override;
+    bool GetEdgeWeight(TVertexID src, TVertexID dest, double &weight) const noexcept override;
 
     void BreadthFirstSearchUnweighted(TVertexID start, const TTraversalFunction&callback) const noexcept override;
+    
+    void DepthFirstSearch(TVertexID start, const TTraversalFunction&callback) const noexcept override;
 
     bool BreadthFirstSearchWeighted(TVertexID start, const TTraversalFunction&callback) const noexcept override;
 
-    bool ForEach(const TTraversalFunction &callback) noexcept override;
+    bool ForEach(const TTraversalFunction &callback) const noexcept override;
 
     TVertexID AddVertex(TVertexTag id) noexcept override;
 
@@ -37,7 +42,7 @@ class CAdjacencyListGraph : public virtual CFullmutableGraph{
 
     bool AddEdge(TVertexID src, TVertexID dest, double weight = EdgeWeightInvalid, bool bidir = true) noexcept override;
 
-    bool RomoveEdge(TVertexID src, TVertexID dest) noexcept override);
+    bool RemoveEdge(TVertexID src, TVertexID dest) noexcept override;
 
     bool SetEdgeWeight(TVertexID src, TVertexID dest, double weight) noexcept override;
 };

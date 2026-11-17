@@ -155,8 +155,8 @@ struct CAdjacencyListGraph::SImplementation{
         std::vector<bool> Visited(DVertices.size(),false);
         if(VertexIDIsValid(start)){
             DepthFirstSearchInternal(start,VertexIDInvalid,0,Visited,callback);
+        }
     }
-
 
     // Performs a weighted breadth-first search starting at the specified vertex.
     // Returns true if the search completes successfully.
@@ -167,7 +167,7 @@ struct CAdjacencyListGraph::SImplementation{
         for(TVertexID Index = 0; Index < DVertices.size(); Index++){
             if(VertexIDIsValid(Index)){
                 for(auto &Edge : DVertices[Index].DEdges){
-                    if(VertexIDIsValid(Edge.DDestination) && (std::isnan(Edge.DWeight < 0.0)){
+                    if(VertexIDIsValid(Edge.DDestination) && (std::isnan(Edge.DWeight) || Edge.DWeight < 0.0)){
                         return false;
                     }
                 }
@@ -178,11 +178,11 @@ struct CAdjacencyListGraph::SImplementation{
         std::vector<bool> Visited(DVertices.size(),false);
         std::vector<double> Distance(DVertices.size(),std::numeric_limits<double>::infinity());
         std::vector<std::size_t> Depth(DVertices.size(),0);
-        std::vector<TVertexID> Depth(DVertice.size(),VertexIDInvalid);
+        std::vector<TVertexID> Parent(DVertices.size(),VertexIDInvalid);
         Distance[start] = 0.0;
-        Horizon.push({0.0,strat});
+        Horizon.push({0.0,start});
         while(!Horizon.empty()){
-            auto Current + Horizon.top().second;
+            auto Current = Horizon.top().second;
             Horizon.pop();
             if(Visited[Current]){
                 continue;
@@ -213,9 +213,9 @@ struct CAdjacencyListGraph::SImplementation{
     // Visits every vertex in the graph, calling the callback for each one.
     // Returns true if the traversal completes successfully.
     bool ForEach(const TTraversalFunction &callback) const noexcept{
-        for(TVertexID Index = 0; Index < DVertices, size(); Index++{
+        for(TVertexID Index = 0; Index < DVertices.size(); Index++){
             if(VertexIDIsValid(Index)){
-                auto Control = callback(Index, VertexIDInvalid,0,std::numeric_limits<double>::quiet_NAN());
+                auto Control = callback(Index, VertexIDInvalid,0,std::numeric_limits<double>::quiet_NaN());
                 if(Control ==  EGraphTraversal::Stop){
                     return false;
                 }
